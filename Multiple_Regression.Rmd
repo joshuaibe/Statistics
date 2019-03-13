@@ -1,0 +1,130 @@
+---
+title: "Multiple Regression"
+author: "Joshua Ibe"
+date: "February 25, 2019"
+output:
+  word_document: default
+  pdf_document: default
+---
+
+
+a) Fit a multiple linear regression model relating yield to these regressors
+
+```{r}
+data=read.csv('/home/jayibex/Desktop/Data_Sets/B7.csv', header=T)
+head(data)
+plot(data)
+y= data[,6]
+x1=data[,1]
+x2= data[,2]
+x3= data[,3]
+x4= data[,4]
+x5= data[,5]
+
+n=length(y)
+
+n
+fit=lm(y~ x1 +x2 +x3 +x4 +x5, data)
+fit
+
+
+```
+From the plot is seems there is no instance of multicolinearity.
+
+ Model is y= 5.208e+01  +5.556e-02x1 +2.821e-01x2 +  1.250e-01x3 +1.776e-16x4 +-1.606e+01x5
+Which is equivalent to 
+(Total Yield of Oil per Batch of Peanuts) = 5.208e+01 +5.556e-02(pressure) +2.821e-01(temp) +  1.250e-01(moisture) +1.776e-16(flow rate) +-1.606e+01(peanut particle size)
+
+
+b) Test for significance of regression. What canclusions can you draw?
+
+We must draw the necessary components to conduct a p-value test. 
+
+```{r}
+
+summary(fit)
+anov=anova(fit)
+anov
+
+k= 5  #number of x's
+p= 6  #number of coefficients(betas) in the model p = k +1
+num_res= 10
+df_f= (k+num_res)-p  
+SSr= 650.5 #Sum Square Residuals
+MSr= SSr/2 
+MSres =  65.1 #Mean Square Residuals
+F0=MSr/MSres
+
+#p0 (critical value)
+abs(qt(0.025, df_f))
+
+#p-value
+pf(F0, df1=5, df2=n-p, lower.tail=FALSE)
+
+#Decision: ?
+# p0 is greater than p-val therefore we reject the null hypothesis
+
+
+```
+
+
+c) Use t test to access the contribution of each regressor to the model. Discuss your findings.
+The larger the F value the more likely fail to reject. 
+
+Each regressor coeffiecent is subjected to the hypothesis test
+$H_{0}:\hat{\beta} = 0 \\ H_{1}:\hat{\beta} = 0$
+
+Test Statistic:
+$t_{0} = \frac{\hat{\beta_{j}}}{\sqrt{\sigma^2C_{jj}}} = \frac{\hat{\beta_{j}}}{se(\beta_{j})}$
+
+Reject $H_{0}$ if $|t_{0}|$ > $t_{\frac{\alpha}{2},n-k-1}$  
+or 
+$p_{t_{\frac{\alpha}{2},n-k-1}}$ > $p_{t_{0}}$
+
+
+From the summary table, we observe on the column Pr(>|t|)
+ 
+The intercept $\beta_{0}$ has a p-value of approximately 0.02 which is less than 0.05 (5% confidence interval), which implies that the intercept is not equal to zero
+
+$x_{1}$ has a p-value of approximately 0.09 which is greater than 0.05 (5% confidence interval), which implies that the regressor $x_{1}$ is not contributing significantly to the model of y given that the rest of the regressors $x_{i}$ is in the model
+
+$x_{2}$ has a p-value of approximately 0.0006 which is less than 0.05 (5% confidence interval), which implies that the regressor $x_{2}$ is contributing significantly to the model of y given that the rest of the regressors $x_{i}$ is in the model
+
+$x_{3}$ has a p-value of approximately 0.7 which is greater than 0.05 (5% confidence interval), which implies that the regressor $x_{3}$ is not contributing significantly to the model of y given that the rest of the regressors $x_{i}$ is in the model
+
+$x_{4}$ has a p-value of approximately 1.00 which is less than 0.05 (5% confidence interval), which implies that the regressor $x_{4}$ is not contributing significantly to the model of y given that the rest of the regressors $x_{i}$ is in the model
+
+$x_{5}$ has a p-value of approximately 0.0006 which is less than 0.05 (5% confidence interval), which implies that the regressor $x_{5}$ is contributing significantly to the model of y given that the rest of the regressors $x_{i}$ is in the model
+
+
+d) Ralculate R^2 and R_adj^2 for this model. Compare these values to the R^2 and the R_adj^2 for the multiple linear regression model relatinig yeild to tempuratre and the particle size. Discuss your results. 
+
+```{r}
+sum_fit = summary(fit)
+
+sum_fit$r.squared
+
+```
+R-squared is 0.9372286 from the summary table, which implies that approimately 94% of the
+model is explained by the 5 regressor variables
+
+Since there are regressors that are not contributing to the true model; $x_{1}$ , $x_{3}$, $x_{4}$.  We need to get R-squared adjusted to show the true percentage that is explained by the relevant regressors $x_{2}$ and $x_{5}$
+
+```{r}
+sum_fit$adj.r.squared
+
+```
+
+0.9058429 or approximately 91% represents the true percentage of the y variable, the model explained by the two regressor variables $x_{2}$ and $x_{5}$.
+
+e.) Finally we would like to see the confidence intervals for the coeffiecent $CO_{2}$ temperature which was $x_{2}$ in the model. Using the confidence interval function build into R
+```{r}
+confit = confint(fit)
+confit
+confit[3, ]
+
+```
+We are 95% confident  that the $CO_{2}$ temperature coeffieicnt (slope) is between 0.1537804 and 0.4105053 and zero is not in that interval.  
+
+
+
