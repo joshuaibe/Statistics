@@ -1,0 +1,56 @@
+---
+title: "Simple Linear Regression"
+author: "Joshua Ibe"
+date: "February 19, 2019"
+output:
+  word_document: default
+  pdf_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Lab 1, SOLUTIONS (DATA 2.7)
+
+```{r cars}
+dat=read.csv("/home/jayibex/Desktop/Data_Sets/Chapter 2/Problems/data-prob-2-7.csv", header = T)
+x=dat[,2]
+y=dat[,1]
+n=length(x)
+
+Sxx=sum(x^2)-sum(x)^2/n
+Sxy=sum(x*y)-sum(x)*sum(y)/n
+
+#LS estimates
+B1H=Sxy/ Sxx
+B1H
+
+B0H=mean(y)-mean(x)*B1H
+B0H
+```
+
+
+
+Problem 2. The estimate of the true error variance σ^2 is MSres given below
+
+
+```{r}
+res = y- (B0H + x*B1H)
+SSres = sum(res^2)
+MSres = SSres/(n-2)
+MSres
+```
+
+
+```{r}
+
+#estimated/fitted SLR line
+yH=B0H + sort(x)*B1H
+
+#plotting
+plot(x,y)
+lines(sort(x),yH, col="red")
+
+```
+
